@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Seismic: live earthquake explorer</title>
+    <meta name="description" content="Explore every earthquake of the last 30 days, live from USGS. Linked crossfilter charts computed in a Web Worker, up to a million points." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231a1a19'/%3E%3Cpath d='M3 17h6l3-9 4 16 3-11 2 4h8' fill='none' stroke='%233987e5' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 17h6l3-9 4 16 3-11 2 4h8" /></svg>
+        <div>
+          <h1>Seismic</h1>
+          <p>Every earthquake on Earth in the last 30 days</p>
+        </div>
+      </div>
+      <label class="source">
+        <span>Data</span>
+        <select id="source">
+          <option value="all">Live · all magnitudes</option>
+          <option value="m25">Live · M2.5+ only</option>
+          <option value="snapshot">Offline snapshot</option>
+          <option value="stress">Stress test · 1,000,000 events</option>
+        </select>
+      </label>
+      <p class="muted" id="source-status" aria-live="polite">Loading…</p>
+      <a class="gh" href="https://github.com/chop-prog/seismic" target="_blank" rel="noopener">Source</a>
+    </header>
+
+    <section class="filters" aria-label="Filters">
+      <div class="presets" role="group" aria-label="Quick filters">
+        <button data-preset="day">Last 24 h</button>
+        <button data-preset="week">Last 7 days</button>
+        <button data-preset="strong">M 4.5+</button>
+        <button data-preset="shallow">Shallow (&lt; 70 km)</button>
+        <button data-preset="japan">Japan</button>
+        <button data-preset="alaska">Alaska</button>
+      </div>
+      <div id="chips" class="chips" aria-live="polite"></div>
+      <button id="reset" class="reset">Reset</button>
+    </section>
+
+    <section class="kpis" aria-label="Summary">
+      <div class="kpi"><span>Events</span><b id="k-count">–</b><small id="k-count-sub"></small></div>
+      <div class="kpi"><span>Strongest</span><b id="k-max">–</b><small id="k-max-sub"></small></div>
+      <div class="kpi"><span>M 5.0 and above</span><b id="k-strong">–</b><small>significant events</small></div>
+      <div class="kpi"><span>Mean depth</span><b id="k-depth">–</b><small>below the surface</small></div>
+      <div class="kpi"><span>Tsunami flag</span><b id="k-tsunami">–</b><small>events flagged by USGS</small></div>
+    </section>
+
+    <main class="grid">
+      <section class="card map-card">
+        <header>
+          <h3>Epicentres</h3>
+          <span class="muted hint">Drag to select a region · click to clear</span>
+        </header>
+        <div class="map-wrap">
+          <canvas id="map" role="img" aria-label="World map of earthquake epicentres, sized by magnitude and coloured by depth"></canvas>
+          <div id="map-tip" class="tip" hidden></div>
+        </div>
+        <footer class="legend">
+          <div class="points-only"><b>Depth</b><div id="legend-depth" class="swatches"></div></div>
+          <div class="points-only"><b>Magnitude</b><div id="legend-size" class="sizes"></div></div>
+          <div class="density-only"><b>Density</b><div class="ramp"><span>sparse</span><i></i><span>dense</span></div></div>
+        </footer>
+      </section>
+      <section class="card top-card">
+        <header><h3>Strongest in selection</h3></header>
+        <ol id="top" class="top-list"></ol>
+      </section>
+      <section id="h-time" class="wide"></section>
+      <section id="h-mag"></section>
+      <section id="h-depth"></section>
+    </main>
+
+    <footer class="foot">
+      <span id="perf"></span>
+      <span>Data: <a href="https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php" target="_blank" rel="noopener">USGS Earthquake Hazards Program</a> · Map: Natural Earth</span>
+    </footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
